@@ -1,4 +1,4 @@
-# ShopEasy Customer Service Bot 🛒
+# ShopEasy Customer Service Bot 
 
 An AI-powered customer service chatbot for ShopEasy, built with **Anthropic's Claude API**. Handles order tracking, product inquiries, returns, technical support, and general questions — with full multi-turn conversation memory.
 
@@ -49,12 +49,12 @@ cd shopeasy-bot
 
 ```bash
 # Mac / Linux
-python3 -m venv venv
-source venv/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate
 
 # Windows
-python -m venv venv
-venv\Scripts\activate
+python -m venv .venv
+.venv\Scripts\activate
 ```
 
 ### 3. Install dependencies
@@ -175,4 +175,4 @@ MIT License — see [LICENSE](LICENSE) for details.
 ## Author
 
 **Michael Lianeris**  
-Built as part of the Udacity AI course — Implementing a Chatbot with an LLM.
+
