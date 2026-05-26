@@ -1,17 +1,20 @@
 # ShopEasy Customer Service Bot 
 
-An AI-powered customer service chatbot for ShopEasy, built with **Anthropic's Claude API**. Handles order tracking, product inquiries, returns, technical support, and general questions — with full multi-turn conversation memory.
+An AI-powered customer service chatbot for ShopEasy, built with **Anthropic's Claude API**. Includes a FastAPI web server, a polished chat UI, REST API endpoints, intent classification, and full multi-turn conversation memory.
 
 ---
 
 ## Features
 
+- **FastAPI Web Server** — modern, fast backend with auto-generated API docs
+- **Chat UI** — clean browser-based interface with streaming responses and typing animations
 - **Intent Classification** — automatically detects what the customer needs
 - **Multi-turn Conversations** — remembers full conversation context
 - **5 Intent Categories** — order status, product info, returns, tech support, general
 - **Conversation Summary** — generates handoff summaries for human agents
 - **Session Reset** — cleanly starts a new customer session
-- **Error Handling** — graceful fallbacks on API failures
+- **CLI Mode** — also runs as a terminal chatbot without the web server
+- **Unit Tests** — pytest test suite covering all core methods
 
 ---
 
@@ -21,13 +24,16 @@ An AI-powered customer service chatbot for ShopEasy, built with **Anthropic's Cl
 shopeasy-bot/
 ├── shopeasy_bot/
 │   ├── __init__.py        # Package exports
-│   └── bot.py             # Main CustomerServiceBot class
+│   └── bot.py             # CustomerServiceBot class
+├── templates/
+│   └── index.html         # Chat UI served by FastAPI
 ├── tests/
 │   └── test_bot.py        # Unit tests
 ├── docs/
 │   └── architecture.md    # Design decisions and architecture notes
+├── app.py                 # FastAPI web server
 ├── .env.example           # Environment variable template
-├── .gitignore             # Files to exclude from git
+├── .gitignore             # Files excluded from git
 ├── requirements.txt       # Production dependencies
 ├── requirements-dev.txt   # Development/testing dependencies
 ├── setup.py               # Package setup
@@ -49,12 +55,12 @@ cd shopeasy-bot
 
 ```bash
 # Mac / Linux
-python3 -m venv .venv
-source .venv/bin/activate
+python3 -m venv venv
+source venv/bin/activate
 
 # Windows
-python -m venv .venv
-.venv\Scripts\activate
+python -m venv venv
+venv\Scripts\activate
 ```
 
 ### 3. Install dependencies
@@ -65,7 +71,7 @@ pip install -r requirements.txt
 
 ### 4. Set up your API key
 
-Copy the example env file and add your key:
+Copy the example env file and fill in your key:
 
 ```bash
 cp .env.example .env
@@ -78,20 +84,63 @@ ANTHROPIC_API_KEY=sk-ant-your-key-here
 
 Or export it directly in your terminal:
 ```bash
+# Mac / Linux
 export ANTHROPIC_API_KEY="sk-ant-your-key-here"
+
+# Windows
+set ANTHROPIC_API_KEY=sk-ant-your-key-here
 ```
 
-### 5. Run the bot
+### 5. Start the web server
 
 ```bash
-python -m shopeasy_bot.bot
+uvicorn app:app --reload
 ```
+
+Then open your browser at **http://localhost:8000** 🚀
 
 ---
 
 ## Usage
 
-### CLI Chat Mode
+### Web UI (recommended)
+
+Start the server and open http://localhost:8000 in your browser. The chat interface supports:
+- Live streaming responses with typing animation
+- Intent badge shown on every reply
+- Quick suggestion buttons
+- Conversation summary panel
+- Session reset
+
+### REST API
+
+| Method | Endpoint  | Description                          |
+|--------|-----------|--------------------------------------|
+| `GET`  | `/`       | Serves the chat UI                   |
+| `POST` | `/chat`   | Send a message, get reply + intent   |
+| `POST` | `/reset`  | Start a new session                  |
+| `GET`  | `/summary`| Get a handoff summary                |
+| `GET`  | `/health` | Check server status                  |
+| `GET`  | `/docs`   | Interactive API docs (auto-generated)|
+
+Example request:
+```bash
+curl -X POST http://localhost:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Where is my order #12345?"}'
+```
+
+Example response:
+```json
+{
+  "reply": "I'd be happy to help track order #12345...",
+  "intent": "order_status"
+}
+```
+
+### CLI Mode
+
+Run without the web server directly in your terminal:
 
 ```bash
 python -m shopeasy_bot.bot
@@ -99,11 +148,11 @@ python -m shopeasy_bot.bot
 
 Available commands during chat:
 
-| Command | Action |
-|---------|--------|
-| `quit` / `exit` | End the session |
-| `reset` | Start a new conversation |
-| `summary` | Print a handoff summary |
+| Command         | Action                    |
+|-----------------|---------------------------|
+| `quit` / `exit` | End the session           |
+| `reset`         | Start a new conversation  |
+| `summary`       | Print a handoff summary   |
 
 ### Use as a Python Module
 
@@ -132,13 +181,13 @@ bot.reset_conversation()
 
 ## Intent Categories
 
-| Intent | Example Phrases |
-|--------|----------------|
-| `order_status` | "Where is my order?", "Track my package #123" |
-| `product_info` | "Do you have wireless headphones?", "What's the difference between X and Y?" |
-| `returns` | "How do I return an item?", "What's your refund policy?" |
-| `technical_support` | "I can't log in", "Payment isn't going through" |
-| `general` | "Hi!", "What are your business hours?" |
+| Intent              | Example Phrases                                          |
+|---------------------|----------------------------------------------------------|
+| `order_status`      | "Where is my order?", "Track my package #123"           |
+| `product_info`      | "Do you have wireless headphones?", "Compare X vs Y"    |
+| `returns`           | "How do I return an item?", "What's your refund policy?"|
+| `technical_support` | "I can't log in", "Payment isn't going through"         |
+| `general`           | "Hi!", "What are your business hours?"                  |
 
 ---
 
@@ -153,15 +202,17 @@ pytest tests/ -v
 
 ## Environment Variables
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `ANTHROPIC_API_KEY` | Yes | Your Anthropic API key from console.anthropic.com |
+| Variable            | Required | Description                                        |
+|---------------------|----------|----------------------------------------------------|
+| `ANTHROPIC_API_KEY` | Yes      | Your API key from console.anthropic.com            |
 
 ---
 
 ## Built With
 
 - [Anthropic Claude API](https://docs.anthropic.com) — `claude-sonnet-4-5`
+- [FastAPI](https://fastapi.tiangolo.com) — web framework
+- [Uvicorn](https://www.uvicorn.org) — ASGI server
 - Python 3.9+
 
 ---
@@ -175,4 +226,4 @@ MIT License — see [LICENSE](LICENSE) for details.
 ## Author
 
 **Michael Lianeris**  
-
+Built as part of the Udacity AI course — Implementing a Chatbot with an LLM.
