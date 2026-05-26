@@ -1,4 +1,4 @@
-# ShopEasy Customer Service Bot 
+# ShopEasy Customer Service Bot 🛒
 
 An AI-powered customer service chatbot for ShopEasy, built with **Anthropic's Claude API**. Features a FastAPI web server, a polished streaming chat UI, REST API endpoints, and intent classification — fully containerised with Docker.
 
@@ -49,17 +49,60 @@ shopeasy-bot/
 ## Quickstart — Docker (recommended)
 
 ### Prerequisites
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running
-- An Anthropic API key from [console.anthropic.com](https://console.anthropic.com)
 
-### 1. Clone the repository
+### 1. Install Docker (if you already have it, go to step 2)
+
+**Mac (Homebrew):**
+```bash
+brew install --cask docker
+open /Applications/Docker.app
+```
+
+**Mac (without Homebrew — install Homebrew first):**
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+brew install --cask docker
+open /Applications/Docker.app
+```
+
+**Windows (winget):**
+```powershell
+winget install Docker.DockerDesktop
+```
+
+**Windows (manual):**
+Download and run the installer from https://www.docker.com/products/docker-desktop
+
+**Linux (Ubuntu/Debian):**
+```bash
+sudo apt-get update
+sudo apt-get install -y ca-certificates curl gnupg
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+sudo usermod -aG docker $USER
+```
+
+Verify Docker is installed and running:
+```bash
+docker --version
+docker compose version
+```
+
+### 2. Get your Anthropic API key
+- Go to [console.anthropic.com](https://console.anthropic.com)
+- Click **API Keys** → **Create Key**
+- Copy the key — it starts with `sk-ant-...`
+
+### 3. Clone the repository
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/shopeasy-bot.git
 cd shopeasy-bot
 ```
 
-### 2. Set up your API key
+### 4. Set up your API key
 
 ```bash
 cp .env.example .env
@@ -70,15 +113,15 @@ Edit `.env` and add your key:
 ANTHROPIC_API_KEY=sk-ant-your-key-here
 ```
 
-### 3. Build and run
+### 5. Build and run
 
 ```bash
 docker compose up --build
 ```
 
-### 4. Open the app
+### 6. Open the app
 
-Visit **http://localhost:8000** in your browser 
+Visit **http://localhost:8000** in your browser 🚀
 
 ### Useful Docker commands
 
@@ -111,12 +154,12 @@ cd shopeasy-bot
 
 ```bash
 # Mac / Linux
-python3 -m venv .venv
-source .venv/bin/activate
+python3 -m venv venv
+source venv/bin/activate
 
 # Windows
-python -m venv .venv
-.venv\Scripts\activate
+python -m venv venv
+venv\Scripts\activate
 ```
 
 ### 3. Install dependencies
@@ -253,4 +296,5 @@ MIT License — see [LICENSE](LICENSE) for details.
 ## Author
 
 **Michael Lianeris**
+
 
