@@ -1,4 +1,4 @@
-# ShopEasy Customer Service Bot 🛒
+# ShopEasy Customer Service Bot 
 
 An AI-powered customer service chatbot for ShopEasy, built with **Anthropic's Claude API**. Handles order tracking, product inquiries, returns, technical support, and general questions — with full multi-turn conversation memory.
 
