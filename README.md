@@ -1,4 +1,4 @@
-# ShopEasy Customer Service Bot 🛒
+# ShopEasy Customer Service Bot 
 
 An AI-powered customer service chatbot for ShopEasy, built with **Anthropic's Claude API**. Features a FastAPI web server, a polished streaming chat UI, REST API endpoints, and intent classification — fully containerised with Docker.
 
@@ -121,7 +121,7 @@ docker compose up --build
 
 ### 6. Open the app
 
-Visit **http://localhost:8000** in your browser 🚀
+Visit **http://localhost:8000** in your browser 
 
 ### Useful Docker commands
 
