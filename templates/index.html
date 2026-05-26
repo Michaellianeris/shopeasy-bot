@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ShopEasy Support</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #f5f4f0;
+      --surface:   #ffffff;
+      --border:    rgba(0,0,0,0.10);
+      --border-md: rgba(0,0,0,0.18);
+      --text:      #1a1a1a;
+      --muted:     #6b6b6b;
+      --hint:      #9e9e9e;
+      --blue-bg:   #e6f1fb;
+      --blue-text: #185fa5;
+      --green-bg:  #e1f5ee;
+      --green-text:#0f6e56;
+      --amber-bg:  #faeeda;
+      --amber-text:#854f0b;
+      --red-bg:    #faece7;
+      --red-text:  #993c1d;
+      --purple-bg: #eeedfe;
+      --purple-text:#534ab7;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    #app {
+      width: 100%;
+      max-width: 720px;
+      height: 90vh;
+      max-height: 780px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    #header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface);
+    }
+    #avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: var(--blue-bg);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    #header-info h1 { font-size: 15px; font-weight: 600; color: var(--text); }
+    #header-info p  { font-size: 12px; color: var(--muted); margin-top: 2px; display: flex; align-items: center; gap: 5px; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; display: inline-block; }
+    #header-btns { margin-left: auto; display: flex; gap: 6px; }
+    .hbtn {
+      font-size: 12px; padding: 6px 12px;
+      border: 1px solid var(--border-md); border-radius: 99px;
+      background: transparent; color: var(--muted); cursor: pointer;
+      display: flex; align-items: center; gap: 5px; transition: all 0.15s;
+    }
+    .hbtn:hover { background: var(--bg); color: var(--text); }
+
+    /* ── Messages ── */
+    #msgs {
+      flex: 1; overflow-y: auto; padding: 20px;
+      display: flex; flex-direction: column; gap: 18px;
+      scroll-behavior: smooth;
+    }
+    #msgs::-webkit-scrollbar { width: 4px; }
+    #msgs::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 4px; }
+
+    .msg-group { display: flex; flex-direction: column; gap: 4px; }
+    .msg-group.bot  { align-items: flex-start; }
+    .msg-group.user { align-items: flex-end; }
+
+    .msg-row { display: flex; align-items: flex-end; gap: 8px; }
+    .msg-row.user { flex-direction: row-reverse; }
+
+    .av {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; flex-shrink: 0;
+    }
+    .av.bot  { background: var(--blue-bg); }
+    .av.user { background: var(--green-bg); }
+
+    .bubble {
+      padding: 11px 15px; font-size: 14px; line-height: 1.6;
+      max-width: 75%; word-break: break-word;
+      animation: popIn 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.88) translateY(6px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .bot  .bubble {
+      background: #f5f4f0; border: 1px solid var(--border);
+      border-radius: 16px 16px 16px 4px; color: var(--text);
+    }
+    .user .bubble {
+      background: var(--blue-bg);
+      border-radius: 16px 16px 4px 16px; color: var(--blue-text);
+    }
+
+    .intent-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 500; padding: 3px 9px;
+      border-radius: 99px; margin-bottom: 5px;
+      animation: fadeUp 0.25s ease;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .ip-order   { background: var(--blue-bg);   color: var(--blue-text); }
+    .ip-product { background: var(--green-bg);  color: var(--green-text); }
+    .ip-returns { background: var(--amber-bg);  color: var(--amber-text); }
+    .ip-tech    { background: var(--red-bg);    color: var(--red-text); }
+    .ip-general { background: var(--purple-bg); color: var(--purple-text); }
+
+    .msg-ts { font-size: 11px; color: var(--hint); padding: 0 4px; margin-top: 2px; }
+
+    /* ── Typing indicator ── */
+    .typing-bub {
+      background: #f5f4f0; border: 1px solid var(--border);
+      border-radius: 16px 16px 16px 4px;
+      padding: 13px 18px; display: flex; gap: 5px; align-items: center;
+    }
+    .td {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--hint);
+      animation: tdBounce 1.1s infinite;
+    }
+    .td:nth-child(2) { animation-delay: 0.18s; }
+    .td:nth-child(3) { animation-delay: 0.36s; }
+    @keyframes tdBounce {
+      0%,60%,100% { transform: translateY(0); }
+      30%          { transform: translateY(-7px); }
+    }
+
+    /* ── Stream cursor ── */
+    .cursor {
+      display: inline-block; width: 2px; height: 14px;
+      background: var(--text); margin-left: 2px;
+      vertical-align: middle;
+      animation: blink 0.75s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    /* ── Suggestions ── */
+    #sugs {
+      padding: 10px 20px; display: flex; gap: 6px; flex-wrap: wrap;
+      border-top: 1px solid var(--border);
+    }
+    .sug {
+      font-size: 12px; padding: 6px 13px;
+      border: 1px solid var(--border-md); border-radius: 99px;
+      background: transparent; color: var(--muted); cursor: pointer;
+      transition: all 0.15s; display: flex; align-items: center; gap: 5px;
+    }
+    .sug:hover { background: var(--bg); color: var(--text); border-color: #999; }
+
+    /* ── Input row ── */
+    #inp-row {
+      padding: 12px 16px; border-top: 1px solid var(--border);
+      display: flex; gap: 8px; align-items: center;
+    }
+    #inp {
+      flex: 1; padding: 10px 16px;
+      border: 1px solid var(--border-md); border-radius: 99px;
+      font-size: 14px; font-family: inherit; background: var(--surface);
+      color: var(--text); outline: none; transition: border-color 0.15s;
+    }
+    #inp:focus { border-color: #378add; }
+    #send {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--blue-bg); border: none;
+      color: var(--blue-text); font-size: 17px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s; flex-shrink: 0;
+    }
+    #send:hover   { background: #b5d4f4; }
+    #send:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── Summary panel ── */
+    #sum-panel {
+      display: none; position: absolute; inset: 0;
+      background: var(--surface); z-index: 30;
+      border-radius: var(--radius-lg);
+      flex-direction: column; gap: 18px; padding: 28px; overflow-y: auto;
+    }
+    #sum-panel.open { display: flex; }
+    #app { position: relative; }
+    .sum-label {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+    }
+    .sum-box {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius-md); padding: 16px;
+      font-size: 14px; line-height: 1.65; color: var(--text); min-height: 90px;
+    }
+    .stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+    .stat-card {
+      background: var(--bg); border-radius: var(--radius-sm);
+      padding: 14px; text-align: center;
+    }
+    .stat-n { font-size: 24px; font-weight: 600; color: var(--text); }
+    .stat-l { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .sum-close {
+      align-self: flex-end; font-size: 13px; padding: 8px 16px;
+      border: 1px solid var(--border-md); border-radius: 99px;
+      background: transparent; color: var(--muted); cursor: pointer;
+    }
+    .sum-close:hover { background: var(--bg); color: var(--text); }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <div id="header">
+    <div id="avatar">🛒</div>
+    <div id="header-info">
+      <h1>Alex — ShopEasy Support</h1>
+      <p><span class="dot"></span> Online · powered by Claude</p>
+    </div>
+    <div id="header-btns">
+      <button class="hbtn" onclick="showSummary()">📋 Summary</button>
+      <button class="hbtn" onclick="resetChat()">↺ New chat</button>
+    </div>
+  </div>
+
+  <div id="msgs"></div>
+
+  <div id="sugs">
+    <button class="sug" onclick="usePrompt('Where is my order #45678?')">📦 Track order</button>
+    <button class="sug" onclick="usePrompt('What is your return policy?')">↩️ Returns</button>
+    <button class="sug" onclick="usePrompt('I cannot log into my account')">🔐 Login help</button>
+    <button class="sug" onclick="usePrompt('Tell me about your wireless headphones')">🎧 Products</button>
+  </div>
+
+  <div id="inp-row">
+    <input id="inp" type="text" placeholder="Message Alex…" autocomplete="off" />
+    <button id="send" onclick="sendMsg()" aria-label="Send">➤</button>
+  </div>
+
+  <div id="sum-panel">
+    <div>
+      <div class="sum-label">Conversation summary</div>
+      <div class="sum-box" id="sum-text">Generating…</div>
+    </div>
+    <div>
+      <div class="sum-label">Session stats</div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-n" id="s-msgs">0</div><div class="stat-l">messages</div></div>
+        <div class="stat-card"><div class="stat-n" id="s-intent">—</div><div class="stat-l">last intent</div></div>
+        <div class="stat-card"><div class="stat-n" id="s-time">0s</div><div class="stat-l">session time</div></div>
+      </div>
+    </div>
+    <button class="sum-close" onclick="closeSummary()">✕ Close</button>
+  </div>
+</div>
+
+<script>
+const INTENTS = {
+  order_status:      { label: 'Order status',  cls: 'ip-order',   icon: '📦' },
+  product_info:      { label: 'Product info',  cls: 'ip-product', icon: '🛒' },
+  returns:           { label: 'Returns',        cls: 'ip-returns', icon: '↩️' },
+  technical_support: { label: 'Tech support',  cls: 'ip-tech',    icon: '🔧' },
+  general:           { label: 'General',        cls: 'ip-general', icon: '💬' },
+};
+
+let msgCount = 0, lastIntent = null, startTime = Date.now();
+
+function ts() {
+  return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function addUserMsg(text) {
+  const msgs = document.getElementById('msgs');
+  const g = document.createElement('div');
+  g.className = 'msg-group user';
+  g.innerHTML = `
+    <div class="msg-row user">
+      <div class="av user">👤</div>
+      <div class="bubble">${text.replace(/</g,'&lt;')}</div>
+    </div>
+    <div class="msg-ts">${ts()}</div>`;
+  msgs.appendChild(g);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping() {
+  const msgs = document.getElementById('msgs');
+  const row = document.createElement('div');
+  row.id = 'typing'; row.className = 'msg-group bot';
+  row.innerHTML = `<div class="msg-row bot"><div class="av bot">🤖</div><div class="typing-bub"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>`;
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeTyping() {
+  const el = document.getElementById('typing');
+  if (el) el.remove();
+}
+
+async function streamMsg(text, intent) {
+  const msgs = document.getElementById('msgs');
+  const im = intent && INTENTS[intent];
+  const g = document.createElement('div');
+  g.className = 'msg-group bot';
+  const id = 'bub' + Date.now();
+  g.innerHTML = `
+    <div class="msg-row bot">
+      <div class="av bot">🤖</div>
+      <div>
+        ${im ? `<div class="intent-pill ${im.cls}">${im.icon} ${im.label}</div>` : ''}
+        <div class="bubble" id="${id}"><span class="cursor"></span></div>
+      </div>
+    </div>
+    <div class="msg-ts">${ts()}</div>`;
+  msgs.appendChild(g);
+
+  const bub = document.getElementById(id);
+  const words = text.split(' ');
+  let built = '';
+  for (let i = 0; i < words.length; i++) {
+    built += (i > 0 ? ' ' : '') + words[i];
+    bub.innerHTML = built.replace(/\n/g, '<br>') + '<span class="cursor"></span>';
+    msgs.scrollTop = msgs.scrollHeight;
+    await new Promise(r => setTimeout(r, 25 + Math.random() * 18));
+  }
+  bub.innerHTML = built.replace(/\n/g, '<br>');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+async function sendMsg() {
+  const inp = document.getElementById('inp');
+  const btn = document.getElementById('send');
+  const text = inp.value.trim();
+  if (!text) return;
+
+  inp.value = '';
+  btn.disabled = true;
+  document.getElementById('sugs').style.display = 'none';
+  addUserMsg(text);
+  showTyping();
+
+  try {
+    const res = await fetch('/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text })
+    });
+    const data = await res.json();
+    removeTyping();
+    msgCount += 2;
+    lastIntent = data.intent;
+    await streamMsg(data.reply, data.intent);
+    updateStats();
+  } catch (e) {
+    removeTyping();
+    await streamMsg("I'm having trouble connecting. Please try again in a moment.", 'general');
+  }
+  btn.disabled = false;
+  inp.focus();
+}
+
+function updateStats() {
+  document.getElementById('s-msgs').textContent = msgCount;
+  if (lastIntent) document.getElementById('s-intent').textContent = INTENTS[lastIntent]?.label || lastIntent;
+  const secs = Math.round((Date.now() - startTime) / 1000);
+  document.getElementById('s-time').textContent = secs < 60 ? secs + 's' : Math.round(secs / 60) + 'm';
+}
+
+async function resetChat() {
+  await fetch('/reset', { method: 'POST' });
+  document.getElementById('msgs').innerHTML = '';
+  document.getElementById('sugs').style.display = 'flex';
+  msgCount = 0; lastIntent = null; startTime = Date.now();
+  updateStats();
+  streamMsg("Conversation reset! Hi, I'm Alex from ShopEasy. How can I help you today?", 'general');
+}
+
+async function showSummary() {
+  document.getElementById('sum-panel').classList.add('open');
+  document.getElementById('sum-text').textContent = 'Generating summary…';
+  updateStats();
+  try {
+    const res = await fetch('/summary');
+    const data = await res.json();
+    document.getElementById('sum-text').textContent = data.summary;
+  } catch {
+    document.getElementById('sum-text').textContent = 'Unable to generate summary at this time.';
+  }
+}
+
+function closeSummary() { document.getElementById('sum-panel').classList.remove('open'); }
+function usePrompt(t) { document.getElementById('inp').value = t; sendMsg(); }
+
+document.getElementById('inp').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
+});
+
+streamMsg("Hi there! 👋 I'm Alex from ShopEasy support. How can I help you today?", 'general');
+</script>
+</body>
+</html>
